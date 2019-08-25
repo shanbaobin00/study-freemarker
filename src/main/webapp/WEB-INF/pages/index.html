@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        ul li{
+            font-weight: bold;
+            font-size: 20px;
+            margin: 15px 0px 5px 0px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 单个变量的取值 -->
+    <h1>${username!}</h1>
+        <!-- list集合 -->
+        <!-- 类似于java中的for循环，userList为集合 item为集合中单个实体 -->
+        <#list userList as item>
+            <li>${item.name}的生日是：${item.birthday?string('yyyy-MM-dd')}</li>
+        <!-- 闭合集合 -->
+        </#list>
+    </ul>
+</body>
+</html>

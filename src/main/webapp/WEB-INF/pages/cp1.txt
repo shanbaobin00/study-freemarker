@@ -1,0 +1,20 @@
+
+#macro、nested、return章节
+    macro语法:
+        <#macro macro_name param1 param2 param3 paramN>
+            template_code ${param1}
+        </#macro>
+
+    调用
+        <@macro_name param1="value1" param2="value2"/>
+        <@macro_name param1="value1" param2="value2"/>
+            nested_template
+        </@macro_name>
+
+#function语法
+    <#function function_name param1 param2>
+        <#return >
+    </#function>
+
+    调用
+    ${doAdd(100,100)}

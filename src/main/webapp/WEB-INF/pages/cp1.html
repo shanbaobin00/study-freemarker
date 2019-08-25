@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        .demo-div ul li{
+            font-weight: bold;
+            font-size: 20px;
+            margin: 15px 0px 5px 0px;
+        }
+    </style>
+</head>
+<body style="padding-left: 50px;">
+    <h1>逻辑</h1>
+
+    <h2>1,取基本值</h2>
+    <div>
+        <ul>
+            <li>
+                整数：<font color="red">${intVar}</font>
+            </li>
+            <li>
+                长整数：<font color="red">${longVar}</font>
+            </li>
+            <li>
+                字符串：<font color="red">${stringVar}</font>
+            </li>
+            <li>
+                双精度：<font color="red">${doubleVar}</font>
+            </li>
+            <li>
+                <!-- 注意这里的boolean类型直接打印是打印不出来的freemarker会报错 -->
+                <!-- boolean类型只能代表真或者假，要想打印那么就利用?string('','')的方式 -->
+                布尔值：<font color="red">${booleanVar?string('yes','no')}</font>
+            </li>
+            <li>
+                <!-- 注意这里的Date类型直接打印是打印不出来的freemarker会报错 -->
+                <!-- 我们不是在spring-servlet.xml文件中配置了对应的格式了吗 -->
+                <!-- 是因为freemarker定义的date格式是对java.sql.Date生效的 -->
+                <!-- 而我们使用的是java.util.Date，那么就需要使用?string('')进行转化 -->
+                Date类型：<font color="red">${dateVar?string('yyyy-MM-dd')}</font>
+            </li>
+            <li>
+                <!-- 注意这里的nullVar如果不加?是会报错的，（类似于java中的空指针异常） -->
+                <!-- 我们在nullVar变量的后面加上!就可以打印了，!后面可以加默认值 -->
+                <!-- 在开发过程中，我们不确定一个变量到底是不是空，所有一般都会加上!  避免freemarker抛异常 -->
+                null：<font color="red">${nullVar!'我是默认值'}</font>
+                <!-- 上面的date类型我们也可以使用! ,例如-->
+                Date类型：<font color="red">${dateVar!?string('yyyy-MM-dd')}</font>空值处理
+            </li>
+        </ul>
+    </div>
+    <h2>2,变量的定义、赋值、运算</h2>
+    <div class="demo-div">
+        <ul>
+            <li>赋值&运算</li>
+            <!-- freemarker通过assign来定义变量 -->
+            <#assign a=100/>
+            a=<font color="red">${a}</font>
+            <br/>
+            <!-- freemarker的基础加法运算 -->
+            a+100=<font color="red">${a+100}</font>
+        </ul>
+    </div>
+    <h2>3,封装类型</h2>
+    <div class="demo-div">
+        <ul>
+            <li>对象</li>
+            <!-- freemarker的获取对象的属性 -->
+            <!-- 当我们进行注释的时候如果注释的代码中含有freemarker的语句就要使用如下这种注释方式，否则freemarker的语句还是生效的 -->
+            <#--<font color="red">${userObj.name!}</font>-->
+
+            <!-- freemarker获取对象属性的时候，对象如果也是空怎么办呢 -->
+            <!-- 方法1，先判断 -->
+            <#if userObj??>
+                <font color="red">${userObj.name!}</font>
+            <#else>
+                <font color="red">userObj.name is null</font>
+            </#if>
+            <br/>
+            <!-- 方法2，使用!对其整体判断 -->
+            <font color="red">${(userObj.name)!'默认值'}</font><br/>
+            <!-- 通过?html可以将字符串里的html标签显示出来 -->
+            ${(userObj.brief)?html}<br/>
+        </ul>
+    </div>
+
+    <h2>4,集合</h2>
+    <div class="demo-div">
+        <ul>
+            <li>集合List</li>
+            <#list myList as item>
+                <font color="red">${item!}</font><br/>
+            </#list>
+        </ul>
+    </div>
+
+    <h2>5,键值对Map</h2>
+    <div class="demo-div">
+        <ul>
+            <li>键值对Map</li>
+            <#list myMap?keys as key>
+                <font color="red">${key} : ${myMap[key]}</font><br/>
+            </#list>
+        </ul>
+    </div>
+
+    <h2>6,if else</h2>
+    <div class="demo-div">
+        <ul>
+            <li>if</li>
+            <#assign var=100/>
+
+            <#if var == 99>
+                <font color="red">var = 99</font>
+            </#if>
+
+            <#if var == 99>
+                <font color="red">var = 99</font>
+            <#else>
+                <font color="red">var != 99</font>
+            </#if>
+
+            <#if var &gt; 99>
+                <font color="red">var > 99</font>
+            <#elseif var == 99>
+                <font color="red">var = 99</font>
+            <#else>
+                <font color="red">var < 99</font>
+            </#if>
+            <br/>
+            <!--当我们使用集合的时候要用if判断下集合是否为空，不为空再进行遍历，例如-->
+            <br/>
+            <#if myList??>
+                <#list myList as item>
+                    <font color="red">${item!}</font><br/>
+                </#list>
+            </#if>
+            <!--当然我们也可以使用以下方式-->
+            <br/>
+            <#if myList?exists>
+                <#list myList as item>
+                    <font color="red">${item!}</font><br/>
+                </#list>
+            </#if>
+            <li>if && || !</li>
+            <#assign var='python'>
+            <!--freemarker逻辑或-->
+            <#if var=='python' || var=='java'>
+                <font color="red">python or java</font>
+            </#if>
+            <!--freemarker获取字符串长度-->
+            <#if !((var=='python' && var?length==6) || (var=='java'))>
+                <font color="red">python length is 6 或者 java</font>
+            </#if>
+        </ul>
+    </div>
+
+    <h2>7,switch case break default</h2>
+    <div class="demo-div">
+        <ul>
+            <li>switch</li>
+            <!--freemarker的switch不仅支持基本类型还支持switch-->
+            <#assign var=10/>
+            <#switch var>
+                <#case 10>555
+                <#case 10>10 or 11<br/>
+                <#break>
+                <#case 100>100<br/>
+                <#break>
+                <#default>other
+            </#switch>
+        </ul>
+    </div>
+
+    <h2>8,字符串常用内建函数</h2>
+    <div class="demo-div">
+        <ul>
+            <#assign a='hello'/>
+            <#assign b='world'/>
+            <li>连接</li>
+            <font color="red">${a + b}</font><br/>
+            <li>截取</li>
+            <font color="red">${(a + b)?substring(5,8)}</font><br/>
+            <li>长度</li>
+            <font color="red">${(a + b)?length}</font><br/>
+            <li>大写</li>
+            <font color="red">${(a + b)?upper_case}</font><br/>
+            <li>小写</li>
+            <font color="red">${(a + b)?lower_case}</font><br/>
+            <li>index_of</li>
+            <font color="red">${(a + b)?index_of('w')}</font><br/>
+            <li>last_index_of</li>
+            <font color="red">${(a + b)?last_index_of('o')}</font><br/>
+            <li>replace</li>
+            <font color="red">${(a + b)?replace('o','xx')}</font><br/>
+        </ul>
+    </div>
+
+    <h2>9,自定义函数(整数排序 sort_int )</h2>
+    <div class="demo-div">
+        <ul>
+            <#assign myList=[2,3,4,5,1,8,9,8,7] />
+            <li>未排序</li>
+            <#list myList as item>
+                ${item},
+            </#list>
+
+            <li>已排序</li>
+            <!-- 使用自定义的排序函数进行排序 -->
+            <#list sort_int(myList) as item>
+                ${item},
+            </#list>
+        </ul>
+    </div>
+
+    <h2>10,自定义函数(整数排序 sort_int )</h2>
+    <div class="demo-div">
+        <ul>
+            <#assign myList=[2,3,4,5,1,8,9,8,7] />
+            <li>已排序</li>
+            <!-- 使用freemarker集合的内置函数sort进行排序，reverse是倒置 -->
+            <#list myList?sort?reverse as item>
+                ${item_index}:${item}<br/>
+            </#list>
+            <!-- freemarker获取集合的大小 -->
+            ${myList?size}<br/>
+            <!-- freemarker获取集合指定下标的位置 -->
+            ${myList[3]}<br/>
+        </ul>
+    </div>
+
+    <h2>11,自定义指令</h2>
+    <h2>用户123456是否有admin角色，并且返回admin的权限</h2>
+    <div class="demo-div">
+        <ul>
+            <@role user='123456' role='admin';result1,result2>
+            <#if result1>
+                我的角色是<font color="red">admin</font>
+            </#if>
+            我拥有的权限是：
+            <font color="red">
+                <#list result2 as item>
+                    ${item},
+                </#list>
+            </font><br/>
+            </@role>
+        </ul>
+    </div>
+
+    <h2>12,常用内建函数</h2>
+    <div class="demo-div">
+        <ul>
+            <li>处理字符串的内建函数</li>
+                substring、cap_first、ends_with、contains<br/>
+                date、datetime、time<br/>
+                starts_with、index_of、last_index_of、split、trim<br/>
+            <hr/>
+                <!-- split分割 -->
+                <#list 'a|b|c|d'?split('|') as item>
+                    ${item},
+                </#list>
+                <br/>
+
+                <!-- 字符串转日期 -->
+                <#assign var1='01/03/2007'?date('MM/dd/yyyy')/>
+                <#assign var2='15:05:30'?time('HH:mm:ss')/>
+                <#assign var3='2016-12-31 03:05 PM'?datetime('yyyy-MM-dd hh:mm')/>
+                ${var1},${var2},${var3}
+                <br/>
+
+            <li>处理数字的内建函数</li>
+                string、x?string(0.##)<br/>
+                round、floor、ceiling<br/>
+            <hr/>
+                <#assign numVar1=3.141592/>
+                ${numVar1?string('0.##')},
+                ${numVar1?round},
+                <br/>
+            <li>处理List的内建函数</li>
+                first、last、seq_contains、seq_index_of<br/>
+                size、reverse、sort、sort_by<br/>
+                chunk<br/>
+            <li>其他的内建函数</li>
+                is函数：is_string、is_number、is_method<br/>
+                ()、has_content函数<br/>
+                eval求值<br/>
+        </ul>
+    </div>
+
+    <h2>13,macro:宏指令(主要用于封装模板片段)</h2>
+    <div class="demo-div">
+        <ul>
+            <li>栗子1：无参数的macro</li>
+            <div>
+                <!-- 定义macro宏指令 -->
+                <#macro test>
+                    <font color="red">我是无参数的macro</font>
+                </#macro>
+                <!-- 执行macro宏指令 -->
+                <@test />
+            </div>
+            <li>栗子2：有参数的macro</li>
+            <div>
+                <!-- 定义macro宏指令 -->
+                <#macro test param1 param2>
+                    <font color="red">我是有参数的macro, param1=${param1}, param2=${param2}</font>
+                </#macro>
+                <!-- 执行macro宏指令 -->
+                <@test param1='java' param2='python'/>
+            </div>
+            <li>栗子3：有默认值参数的macro</li>
+            <div>
+                <!-- 定义macro宏指令 -->
+                <#macro test param1 param2='py'>
+                    <font color="red">我是有参数的macro, param1=${param1}, param2=${param2}</font>
+                </#macro>
+                <!-- 执行macro宏指令 -->
+                <@test param1='java' param2='python'/>
+            </div>
+            <li>栗子4：有多个参数的macro</li>
+            <div>
+                <!-- 定义macro宏指令 -->
+                <#macro test param1 param2='py' paramExt...>
+                    <font color="red">我是有参数的macro, param1=${param1}, param2=${param2}</font>
+                    <br/>
+                    <font color="red">${paramExt['param3']}</font>
+                    <br/>
+                    <font color="red">${paramExt['param3']}</font>
+                </#macro>
+                <!-- 执行macro宏指令 -->
+                <@test param1='java' param2='python' param3='javascript' param4='nodejs'/>
+            </div>
+        </ul>
+    </div>
+
+    <h2>14,nested(使得macro宏指令更加灵活)</h2>
+    <div class="demo-div">
+        <ul>
+            <#macro test param1='java'>
+                ${param1}<br/>
+                <!-- 可以将参数回传给调用此macro方法的调用处 -->
+                <#nested param1,'我的nested参数'><br/>
+            </#macro>
+            <li>调用</li>
+            <div>
+                <!-- loopVar1，loopVar2可以接受test宏指令中通过nested返回的两个参数 -->
+                <@test param1='java';loopVar1,loopVar2>
+                    <font color="red">hello ${loopVar1} , ${loopVar2}<br/></font>
+                </@test>
+                <@test param1='python';loopVar1>
+                    hello ${loopVar1}<br/>
+                </@test>
+            </div>
+        </ul>
+    </div>
+
+    <h2>15,函数</h2>
+    <div class="demo-div">
+        <ul>
+            <#function doAdd param1 param2>
+                <#return param1+param2>
+            </#function>
+            <li>调用</li>
+            <div>你好，我是调用${doAdd(100,100)}</div>
+        </ul>
+    </div>
+
+
+</body>
+</html>
